@@ -1,0 +1,36 @@
+godystopia 
+==========
+
+godystopia is a wrapper around the [Tokyo Dystopia](http://1978th.net/tokyodystopia/) 
+full text search library for the [Go](http://golang.org) language.
+
+It's very incomplete at this point.  It only does what I've needed so far for an application
+I'm working on.  I'll flush it out as the app progresses and I learn the go language better,
+but I thought it might be useful to some other users.
+
+It's also very probable that the go API will change drastically...
+
+Getting the source
+==================
+
+Get it from github:
+
+    git clone git://github.com/patrickxb/godystopia.git
+
+Building and Installing
+=======================
+
+You need to have go installed and have the `GOROOT`, `GOARCH`, `GOOS`, and `GOBIN`
+environment variables set.
+
+After that, just do:
+
+    make
+    make install
+
+Contact
+=======
+
+Please let me know if you're using this library and if you have any questions or comments.
+You can contact me through github (username = patrickxb), or you can figure out my email 
+address based on my first name (patrick) and my company (xblabs.com).
