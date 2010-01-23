@@ -51,6 +51,15 @@ int xtcidb_ecode(void* idb);
 const char* xtcidb_errmsg(int ecode);
 
 int xtcidb_put(void* idb, long long id, const char* text);
+typedef struct {
+        int* items;
+        int count;
+} search_result;
+void* xtcidb_search(void* idb, const char* query);
+
+void* xtcidb_search_items(void* resp);
+int xtcidb_search_count(void* resp);
+int xtcidb_item(void* resp, int index);
 
 /* Tokyo Tyrant query conditions */
 int x_streq();

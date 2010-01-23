@@ -36,6 +36,9 @@ func main() {
         connection.Put(3, "Thomas Jefferson");
 
         ids := connection.Search("john");
+        for _, id := range ids {
+                fmt.Printf("search result id: %d\n", id);
+        }
 
         /*
         columns := make(map[string]string);

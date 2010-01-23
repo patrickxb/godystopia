@@ -72,6 +72,31 @@ xtcidb_put(void* idb, long long id, const char* text)
         return tcidbput(idb, id, text);
 }
 
+void*
+xtcidb_search(void* idb, const char* query)
+{
+        search_result* result = (search_result*)malloc(sizeof(search_result));
+        result->items = tcidbsearch(idb, query, IDBSSUBSTR, &result->count);
+        return result;
+}
+
+void* 
+xtcidb_search_items(void* resp)
+{
+        return ((search_result*)resp)->items;
+}
+
+int 
+xtcidb_search_count(void* resp)
+{
+        return ((search_result*)resp)->count;
+}
+
+int xtcidb_item(void* resp, int index)
+{
+        return ((search_result*)resp)->items[index];
+}
+
 /* Tokyo Tyrant query conditions */
 /*
 int x_streq() { return RDBQCSTREQ; }

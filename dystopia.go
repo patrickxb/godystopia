@@ -26,6 +26,7 @@ import (
         "os";
 //        "strconv";
         "unsafe";
+        "container/vector";
 )
 
 type Connection struct {
@@ -105,14 +106,22 @@ func (connection *Connection) Close() os.Error {
 // If record exists with this key, it is overwritten
 func (connection *Connection) Put(id int, text string) (err os.Error) {
         fmt.Printf("storing %v => %v\n", id, text);
-        if C.xtcidb_put(connection.Dystopia, _C_int(id), C.CString(text)) == 0 {
+        if C.xtcidb_put(connection.Dystopia, _C_longlong(id), C.CString(text)) == 0 {
                 return os.NewError(connection.ErrorMessage())
         }
         return nil;
 }
 
 func (connection *Connection) Search(query string) (*vector.Vector, os.Error) {
+        resp := C.xtcidb_search(connection.Dystopia, C.CString(query));
+        count := int(C.xtcidb_search_count(resp));
 
+        var result vector.Vector;
+        for i := 0; i < count; i++ {
+                result.Push(C.xtcidb_item(resp, _C_int(i)));
+        }
+
+        return &result, nil;
 }
 
 /*
