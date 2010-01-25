@@ -17,7 +17,9 @@
 package dystopia
 
 // this comment coming up isn't really a comment...tells C package what to include
+// include "tdwrapper.h"
 
+// #include <dystopia.h>
 // #include "tdwrapper.h"
 import "C"
 
@@ -30,7 +32,7 @@ import (
 )
 
 type Connection struct {
-        Dystopia unsafe.Pointer;
+        Dystopia *_C_TCIDB;
 }
 
 type Query struct {
@@ -38,11 +40,12 @@ type Query struct {
 }
 
 func (connection *Connection) ErrorCode() int {
-        return int(C.xtcidb_ecode(connection.Dystopia));
+//        return int(C.xtcidb_ecode(connection.Dystopia));
+        return 0;
 }
 
 func (connection *Connection) ErrorMessage() string {
-        return C.GoString(C.xtcidb_errmsg(C.xtcidb_ecode(connection.Dystopia)))
+        return C.GoString(C.tcidberrmsg(C.tcidbecode(connection.Dystopia)))
 }
 
 func (connection *Connection) ErrorDisplay() {
@@ -71,9 +74,9 @@ func Connect(host string, port int) (connection *Connection, err os.Error) {
 
 func Open(path string, ocode int) (connection *Connection, err os.Error) {
         connection = new(Connection);
-        connection.Dystopia = C.xtcidb_new();
-        open := C.xtcidb_open(connection.Dystopia, C.CString(path), _C_int(ocode));
-        if open == 0 {
+        connection.Dystopia = C.tcidbnew();
+        open := C.tcidbopen(connection.Dystopia, C.CString(path), _C_int(ocode));
+        if open == false {
                 fmt.Printf("couldn't open database\n");
                 connection.ErrorDisplay();
                 return nil, os.NewError(connection.ErrorMessage());
@@ -93,12 +96,12 @@ func OpenAndCreate(path string) (connection *Connection, err os.Error) {
 
 
 func (connection *Connection) Close() os.Error {
-        ok := C.xtcidb_close(connection.Dystopia);
-        if ok == 0 {
+        ok := C.tcidbclose(connection.Dystopia);
+        if ok == false {
                 return os.NewError(connection.ErrorMessage())
         }
 
-        C.xtcidb_del(connection.Dystopia);
+        C.tcidbdel(connection.Dystopia);
 
         return nil;
 }
@@ -106,22 +109,29 @@ func (connection *Connection) Close() os.Error {
 // If record exists with this key, it is overwritten
 func (connection *Connection) Put(id int, text string) (err os.Error) {
         fmt.Printf("storing %v => %v\n", id, text);
-        if C.xtcidb_put(connection.Dystopia, _C_longlong(id), C.CString(text)) == 0 {
+        if C.tcidbput(connection.Dystopia, _C_int64_t(id), C.CString(text)) == false {
                 return os.NewError(connection.ErrorMessage())
         }
         return nil;
 }
 
 func (connection *Connection) Search(query string) (*vector.Vector, os.Error) {
-        resp := C.xtcidb_search(connection.Dystopia, C.CString(query));
-        count := int(C.xtcidb_search_count(resp));
+        var count _C_int;
+        resp := C.tcidbsearch(connection.Dystopia, C.CString(query), C.x_substring(), &count);
+        fmt.Printf("searched for %v, num results = %d, resp = %v\n", query, count, resp);
 
         var result vector.Vector;
-        for i := 0; i < count; i++ {
-                result.Push(C.xtcidb_item(resp, _C_int(i)));
+        for i := 0; i < int(count); i++ {
+                result.Push(int(C.x_get_result_item(resp, _C_int(i))));
         }
 
+        //        return &result, nil;
         return &result, nil;
+}
+
+func (connection *Connection) Fetch(id int) (string) {
+        result := C.tcidbget(connection.Dystopia, _C_int64_t(id));
+        return C.GoString(result);
 }
 
 /*

@@ -29,15 +29,18 @@ func main() {
                 fmt.Printf("no connection: %s\n", err.String());
                 os.Exit(1);
         }
+        fmt.Printf("connection: %v\n", connection);
         defer connection.Close()
 
         connection.Put(1, "George Washington");
         connection.Put(2, "John Adams");
         connection.Put(3, "Thomas Jefferson");
 
-        ids := connection.Search("john");
-        for _, id := range ids {
+        ids, _ := connection.Search("john");
+        for _, id := range *ids {
                 fmt.Printf("search result id: %d\n", id);
+                //fmt.Printf("value: %v\n", connection.Fetch(id.(_C_int64_t)));
+                fmt.Printf("value: %v\n", connection.Fetch(id.(int)));
         }
 
         /*

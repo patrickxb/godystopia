@@ -19,6 +19,7 @@
 
 /* Tokyo Dystopia new/open/close/del */
 
+/*
 void*
 xtcidb_new()
 {
@@ -42,9 +43,10 @@ xtcidb_del(void* idb)
 {
         tcidbdel(idb);
 }
+*/
 
 /* Tokyo Dystopia Q-Gram errors */
-
+/*
 int
 xtcidb_ecode(void* idb)
 {
@@ -56,7 +58,7 @@ xtcidb_errmsg(int ecode)
 {
         return tcidberrmsg(ecode);
 }
-
+*/
 /* open flags */
 
 int x_idbowriter() { return IDBOWRITER; }
@@ -66,6 +68,21 @@ int x_idbotrunc() { return IDBOTRUNC; }
 int x_idbonolock() { return IDBONOLCK; }
 int x_idbolocknoblock() { return IDBOLCKNB; }
 
+int x_substring() { return IDBSSUBSTR; }
+int x_prefix() {return IDBSPREFIX; }
+int x_suffix() {return IDBSSUFFIX; }
+int x_full() { return IDBSFULL; }
+int x_token() { return IDBSTOKEN; }
+int x_token_pre() { return IDBSTOKPRE; }
+int x_token_suf() { return IDBSTOKSUF; }
+
+uint64_t 
+x_get_result_item(uint64_t* result_set, int index)
+{
+        return result_set[index];
+}
+
+/*
 int 
 xtcidb_put(void* idb, long long id, const char* text)
 {
@@ -96,7 +113,7 @@ int xtcidb_item(void* resp, int index)
 {
         return ((search_result*)resp)->items[index];
 }
-
+*/
 /* Tokyo Tyrant query conditions */
 /*
 int x_streq() { return RDBQCSTREQ; }

@@ -5,6 +5,7 @@ TARG=dystopia
 CGOFILES=\
 	 dystopia.go
 CGO_LDFLAGS=tdwrapper.o -ltokyodystopia
+#CGO_LDFLAGS=-ltokyodystopia
 
 
 CLEANFILES+=example
