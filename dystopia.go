@@ -115,12 +115,12 @@ func (connection *Connection) Put(id int, text string) (err os.Error) {
         return nil;
 }
 
-func (connection *Connection) Search(query string) (*vector.Vector, os.Error) {
+func (connection *Connection) Search(query string) (*vector.IntVector, os.Error) {
         var count _C_int;
         resp := C.tcidbsearch(connection.Dystopia, C.CString(query), C.x_substring(), &count);
         fmt.Printf("searched for %v, num results = %d, resp = %v\n", query, count, resp);
 
-        var result vector.Vector;
+        var result vector.IntVector;
         for i := 0; i < int(count); i++ {
                 result.Push(int(C.x_get_result_item(resp, _C_int(i))));
         }
@@ -132,6 +132,20 @@ func (connection *Connection) Search(query string) (*vector.Vector, os.Error) {
 func (connection *Connection) Fetch(id int) (string) {
         result := C.tcidbget(connection.Dystopia, _C_int64_t(id));
         return C.GoString(result);
+}
+
+func (connection *Connection) SearchAndFetch(query string) (*vector.StringVector, os.Error) {
+        ids, err := connection.Search(query)
+        if err != nil {
+                return nil, err;
+        }
+        
+        var result vector.StringVector;
+        for _, id := range *ids {
+                result.Push(connection.Fetch(id));
+        }
+
+        return &result, nil;
 }
 
 /*

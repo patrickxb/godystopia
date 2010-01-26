@@ -40,7 +40,12 @@ func main() {
         for _, id := range *ids {
                 fmt.Printf("search result id: %d\n", id);
                 //fmt.Printf("value: %v\n", connection.Fetch(id.(_C_int64_t)));
-                fmt.Printf("value: %v\n", connection.Fetch(id.(int)));
+                fmt.Printf("value: %v\n", connection.Fetch(id));
+        }
+        
+        names, _ := connection.SearchAndFetch("on");
+        for _, name := range *names {
+                fmt.Printf("search result name: %v\n", name);
         }
 
         /*
