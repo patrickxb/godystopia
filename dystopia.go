@@ -55,6 +55,8 @@ func (connection *Connection) ErrorDisplay() {
 func OpenWriterFlag() int { return int(C.x_idbowriter()) }
 func OpenReaderFlag() int { return int(C.x_idboreader()) }
 func OpenCreateFlag() int { return int(C.x_idbocreate()) }
+func OpenNoLockFlag() int { return int(C.x_idbonolock()) }
+func OpenNoBlockFlag() int { return int(C.x_idbolocknoblock()) }
 
 /*
 func Connect(host string, port int) (connection *Connection, err os.Error) {
@@ -77,16 +79,17 @@ func Open(path string, ocode int) (connection *Connection, err os.Error) {
         connection.Dystopia = C.tcidbnew();
         open := C.tcidbopen(connection.Dystopia, C.CString(path), _C_int(ocode));
         if open == false {
-                fmt.Printf("couldn't open database\n");
+                fmt.Printf("couldn't open database (%d) %s:\n", ocode, path);
                 connection.ErrorDisplay();
                 return nil, os.NewError(connection.ErrorMessage());
         }
-        fmt.Printf("opened database\n");
         return connection, nil;
 }
 
 func OpenReadOnly(path string) (connection *Connection, err os.Error) {
-        return Open(path, OpenReaderFlag());
+        // return Open(path, OpenReaderFlag() | OpenNoBlockFlag());
+        return Open(path, OpenReaderFlag() | OpenNoLockFlag());
+        // return Open(path, OpenReaderFlag());
 }
 
 func OpenAndCreate(path string) (connection *Connection, err os.Error) {
@@ -118,6 +121,20 @@ func (connection *Connection) Put(id int, text string) (err os.Error) {
 func (connection *Connection) Search(query string) (*vector.IntVector, os.Error) {
         var count _C_int;
         resp := C.tcidbsearch(connection.Dystopia, C.CString(query), C.x_substring(), &count);
+        fmt.Printf("searched for %v, num results = %d, resp = %v\n", query, count, resp);
+
+        var result vector.IntVector;
+        for i := 0; i < int(count); i++ {
+                result.Push(int(C.x_get_result_item(resp, _C_int(i))));
+        }
+
+        //        return &result, nil;
+        return &result, nil;
+}
+
+func (connection *Connection) SearchPrefix(query string) (*vector.IntVector, os.Error) {
+        var count _C_int;
+        resp := C.tcidbsearch(connection.Dystopia, C.CString(query), C.x_prefix(), &count);
         fmt.Printf("searched for %v, num results = %d, resp = %v\n", query, count, resp);
 
         var result vector.IntVector;
