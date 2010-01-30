@@ -75,6 +75,7 @@ func Connect(host string, port int) (connection *Connection, err os.Error) {
 */
 
 func Open(path string, ocode int) (connection *Connection, err os.Error) {
+        fmt.Printf("opening database: %s (%d)\n", path, ocode)
         connection = new(Connection);
         connection.Dystopia = C.tcidbnew();
         open := C.tcidbopen(connection.Dystopia, C.CString(path), _C_int(ocode));
@@ -87,8 +88,8 @@ func Open(path string, ocode int) (connection *Connection, err os.Error) {
 }
 
 func OpenReadOnly(path string) (connection *Connection, err os.Error) {
-        // return Open(path, OpenReaderFlag() | OpenNoBlockFlag());
-        return Open(path, OpenReaderFlag() | OpenNoLockFlag());
+        return Open(path, OpenReaderFlag() | OpenNoBlockFlag());
+        //return Open(path, OpenReaderFlag() | OpenNoLockFlag());
         // return Open(path, OpenReaderFlag());
 }
 
